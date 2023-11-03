@@ -23,7 +23,7 @@ You can use this module in your Terraform configuration like this:
 #Key Vault
 module "vault" {
   depends_on = [module.resource_group, module.vnet]
-  source     = "./../.."  # Replace with the actual source path
+  source     = "git::https://github.com/opz0/terraform-azure-key-vault.git?ref=v1.0.0"  # Replace with the actual source path
 
   name        = "annkkdsovvttdcc"
   environment = "test"
@@ -55,7 +55,7 @@ You can use this module in your Terraform configuration like this:
 # Key Vault
 module "vault" {
   depends_on = [module.resource_group, module.vnet]
-  source     = "./../.."  # Update this with the correct path to the module
+  source     = "git::https://github.com/opz0/terraform-azure-key-vault.git?ref=v1.0.0"  # Update this with the correct path to the module
 
   name        = "annkkdsovvddcc"
   environment = "test"
