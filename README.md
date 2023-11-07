@@ -1,5 +1,4 @@
 # terraform-azure-key-vault
-# Terraform-Azure-Key-Vault
 
 ## Table of Contents
 
@@ -15,66 +14,52 @@
 This Terraform module is designed to facilitate the creation of essential Azure resources for your applications, including a Resource Group, Virtual Network (VNet), Subnet, and an Azure Key Vault. It simplifies the infrastructure provisioning process, making it easier to manage your Azure environment
 
 ## Usage
+To use this module, you should have Terraform installed and configured for AZURE. This module provides the necessary Terraform configuration
+for creating AZURE resources, and you can customize the inputs as needed. Below is an example of how to use this module:
 
-- # key-vault-with-RBAC
-You can use this module in your Terraform configuration like this:
+# Examples
+
+# Example:key-vault-with-RBAC
 
 ```hcl
 #Key Vault
 module "vault" {
-  depends_on = [module.resource_group, module.vnet]
-  source     = "git::https://github.com/opz0/terraform-azure-key-vault.git?ref=v1.0.0"  # Replace with the actual source path
-
-  name        = "annkkdsovvttdcc"
-  environment = "test"
-  label_order = ["name", "environment"]
-
-  resource_group_name = module.resource_group.resource_group_name
-
+  source                      = "git::https://github.com/opz0/terraform-azure-key-vault.git?ref=v1.0.0"
+  name                        = "app"
+  environment                 = "test"
+  sku_name                    = "standard"
+  principal_id                = ["771xxxxxxxxxxxxxxxxxx94193"]
+  role_definition_name        = ["Key Vault Administrator"]
+  resource_group_name         = module.resource_group.resource_group_name
+  subnet_id                   = module.subnet.default_subnet_id
+  virtual_network_id          = module.vnet.id
+  enable_private_endpoint     = true
+  enable_rbac_authorization   = true
   purge_protection_enabled    = false
   enabled_for_disk_encryption = true
 
-  sku_name = "standard"
-
-  subnet_id          = module.subnet.default_subnet_id
-  virtual_network_id = module.vnet.vnet_id[0]
-  #private endpoint
-  enable_private_endpoint = true
-  ##RBAC
-  enable_rbac_authorization = true
-  principal_id              = ["c0xxxxxxxxxxxxxxx210aedf"]
-  role_definition_name      = ["Key Vault Administrator"]
+  depends_on                  = [module.resource_group, module.vnet]
 }
 ```
 
-- # key-vault-with-access-policy
-You can use this module in your Terraform configuration like this:
+# Example:key-vault-with-access-policy
 
 
 ```hcl
 # Key Vault
 module "vault" {
-  depends_on = [module.resource_group, module.vnet]
-  source     = "git::https://github.com/opz0/terraform-azure-key-vault.git?ref=v1.0.0"  # Update this with the correct path to the module
-
-  name        = "annkkdsovvddcc"
-  environment = "test"
-  label_order = ["name", "environment"]
-
-  resource_group_name = module.resource_group.resource_group_name
-
+  source                      = "git::https://github.com/opz0/terraform-azure-key-vault.git?ref=v1.0.0"
+  name                        = "app"
+  environment                 = "test"
+  resource_group_name         = module.resource_group.resource_group_name
   purge_protection_enabled    = false
   enabled_for_disk_encryption = true
+  sku_name                    = "standard"
+  subnet_id                   = module.subnet.default_subnet_id
+  virtual_network_id          = module.vnet.id
+  enable_private_endpoint     = true
 
-  sku_name = "standard"
-
-  subnet_id          = module.subnet.default_subnet_id
-  virtual_network_id = module.vnet.vnet_id[0]
-
-  # Private Endpoint
-  enable_private_endpoint = true
-
-  # Access Policy
+  depends_on                  = [module.resource_group, module.vnet]
   access_policy = [
     {
       object_id = "c0fdxxxxxxxxxxxxxxxx10aedf"
@@ -119,10 +104,11 @@ module "vault" {
         "Restore"
       ]
       storage_permissions = []
-    }
+    },
   ]
 }
 ```
+This example demonstrates how to create various AZURE resources using the provided modules. Adjust the input values to suit your specific requirements.
 
 ## Module Inputs
 

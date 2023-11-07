@@ -3,7 +3,7 @@ provider "azurerm" {
 }
 
 module "resource_group" {
-  source      = "git::git@github.com:opz0/terraform-azure-resource-group.git?ref=master"
+  source      = "git::https://github.com/opz0/terraform-azure-resource-group.git?ref=v1.0.0"
   name        = "app"
   environment = "test"
   location    = "North Europe"
@@ -11,7 +11,7 @@ module "resource_group" {
 
 #Vnet
 module "vnet" {
-  source              = "git::git@github.com:opz0/terraform-azure-vnet.git?ref=master"
+  source              = "git::https://github.com/opz0/terraform-azure-vnet.git?ref=v1.0.0"
   name                = "app"
   environment         = "test"
   resource_group_name = module.resource_group.resource_group_name
@@ -20,13 +20,13 @@ module "vnet" {
 }
 
 module "subnet" {
-  source = "git::git@github.com:opz0/terraform-azure-subnet.git?ref=master"
+  source = "git::https://github.com/opz0/terraform-azure-subnet.git?ref=v1.0.0"
 
   name                 = "app2"
   environment          = "test2"
   resource_group_name  = module.resource_group.resource_group_name
   location             = module.resource_group.resource_group_location
-  virtual_network_name = module.vnet.vnet_name[0]
+  virtual_network_name = module.vnet.name
 
   #subnet
   subnet_names    = ["subnet1"]
@@ -46,30 +46,20 @@ module "subnet" {
 
 #Key Vault
 module "vault" {
-  depends_on = [module.resource_group, module.vnet]
-  source     = "./../.."
-
-  name        = "annkkdsovvttdcc"
-  environment = "test"
-  label_order = ["name", "environment", ]
-
-  resource_group_name = module.resource_group.resource_group_name
-
+  source                      = "./../.."
+  name                        = "annk740hyr"
+  environment                 = "test"
+  sku_name                    = "standard"
+  principal_id                = ["771xxxxxxxxxxxxxxxxxe394193"]
+  role_definition_name        = ["Key Vault Administrator"]
+  resource_group_name         = module.resource_group.resource_group_name
+  subnet_id                   = module.subnet.default_subnet_id
+  virtual_network_id          = module.vnet.id
+  enable_private_endpoint     = true
+  enable_rbac_authorization   = true
   purge_protection_enabled    = false
   enabled_for_disk_encryption = true
 
-  sku_name = "standard"
-
-  subnet_id          = module.subnet.default_subnet_id
-  virtual_network_id = module.vnet.vnet_id[0]
-  #private endpoint
-  enable_private_endpoint = true
-  ##RBAC
-  enable_rbac_authorization = true
-  principal_id              = ["c0xxxxxxxxxxxxxxx210aedf"]
-  role_definition_name      = ["Key Vault Administrator"]
-
-
-
+  depends_on = [module.resource_group, module.vnet]
 }
 
