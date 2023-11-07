@@ -86,6 +86,7 @@ variable "network_acls_subnet_ids" {
 }
 
 variable "secrets" {
+  type        = any
   default     = {}
   description = "List of secrets for be created"
 }
@@ -183,4 +184,10 @@ variable "addon_virtual_network_id" {
 variable "location" {
   type    = string
   default = "North Europe"
+}
+
+variable "key_enabled" {
+  type        = bool
+  default     = false
+  description = "Flag to control creation of key vault key resource."
 }

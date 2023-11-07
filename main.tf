@@ -3,7 +3,7 @@ data "azurerm_client_config" "current_client_config" {}
 
 module "labels" {
 
-  source      = "git::git@github.com:opz0/terraform-azure-labels.git?ref=master"
+  source      = "git::https://github.com/opz0/terraform-azure-labels.git?ref=v1.0.0"
   name        = var.name
   environment = var.environment
   managedby   = var.managedby
@@ -11,6 +11,8 @@ module "labels" {
   repository  = var.repository
 }
 
+#tfsec:ignore:azure-keyvault-specify-network-acl
+#tfsec:ignore:azure-keyvault-no-purge
 resource "azurerm_key_vault" "key_vault" {
   name                          = format("%s-kv", module.labels.id)
   location                      = var.location
@@ -74,7 +76,7 @@ resource "azurerm_private_endpoint" "pep" {
   private_service_connection {
     name                           = format("%s-psc-kv", module.labels.id)
     is_manual_connection           = false
-    private_connection_resource_id = join("", azurerm_key_vault.key_vault.*.id)
+    private_connection_resource_id = join("", azurerm_key_vault.key_vault[*].id)
     subresource_names              = ["vault"]
   }
 
@@ -87,21 +89,15 @@ resource "azurerm_private_endpoint" "pep" {
 
 locals {
   valid_rg_name         = var.existing_private_dns_zone == null ? var.resource_group_name : var.existing_private_dns_zone_resource_group_name
-  private_dns_zone_name = var.existing_private_dns_zone == null ? join("", azurerm_private_dns_zone.dnszone.*.name) : var.existing_private_dns_zone
+  private_dns_zone_name = var.existing_private_dns_zone == null ? join("", azurerm_private_dns_zone.dnszone[*].name) : var.existing_private_dns_zone
 }
 
 data "azurerm_private_endpoint_connection" "private-ip" {
   count               = var.enabled && var.enable_private_endpoint ? 1 : 0
-  name                = join("", azurerm_private_endpoint.pep.*.name)
+  name                = join("", azurerm_private_endpoint.pep[*].name)
   resource_group_name = var.resource_group_name
   depends_on          = [azurerm_key_vault.key_vault]
 }
-
-#data "azurerm_private_dns_zone" "example" {
-#  count               = var.enabled && var.enable_private_endpoint ? 1 : 0
-#  name                = local.private_dns_zone_name
-#  resource_group_name = local.valid_rg_name
-#}
 
 resource "azurerm_private_dns_zone" "dnszone" {
   count               = var.enabled && var.existing_private_dns_zone == null && var.enable_private_endpoint ? 1 : 0
@@ -123,18 +119,18 @@ resource "azurerm_private_dns_zone_virtual_network_link" "addon_vent_link" {
   count                 = var.enabled && var.addon_vent_link ? 1 : 0
   name                  = format("%s-pdz-vnet-link-kv-addon", module.labels.id)
   resource_group_name   = var.addon_resource_group_name
-  private_dns_zone_name = var.existing_private_dns_zone == null ? join("", azurerm_private_dns_zone.dnszone.*.name) : var.existing_private_dns_zone
+  private_dns_zone_name = var.existing_private_dns_zone == null ? join("", azurerm_private_dns_zone.dnszone[*].name) : var.existing_private_dns_zone
   virtual_network_id    = var.addon_virtual_network_id
   tags                  = module.labels.tags
 }
 
 resource "azurerm_private_dns_a_record" "arecord" {
   count               = var.enabled && var.enable_private_endpoint ? 1 : 0
-  name                = join("", azurerm_key_vault.key_vault.*.name)
+  name                = join("", azurerm_key_vault.key_vault[*].name)
   zone_name           = local.private_dns_zone_name
   resource_group_name = local.valid_rg_name
   ttl                 = 3600
-  records             = [data.azurerm_private_endpoint_connection.private-ip.0.private_service_connection.0.private_ip_address]
+  records             = [data.azurerm_private_endpoint_connection.private-ip[0].private_service_connection[0].private_ip_address]
   tags                = module.labels.tags
   lifecycle {
     ignore_changes = [
@@ -152,8 +148,8 @@ resource "azurerm_user_assigned_identity" "example" {
 
 resource "azurerm_role_assignment" "aks_user_assigned" {
   count                = var.enabled ? 1 : 0
-  principal_id         = join("", azurerm_user_assigned_identity.example.*.principal_id)
-  scope                = join("", azurerm_key_vault.key_vault.*.id)
+  principal_id         = join("", azurerm_user_assigned_identity.example[*].principal_id)
+  scope                = join("", azurerm_key_vault.key_vault[*].id)
   role_definition_name = "Reader"
 }
 
@@ -161,15 +157,16 @@ resource "azurerm_role_assignment" "aks_user_assigned" {
 resource "azurerm_role_assignment" "rbac_user_assigned" {
   count                = var.enabled && var.enable_rbac_authorization ? length(var.principal_id) : 0
   principal_id         = element(var.principal_id, count.index)
-  scope                = join("", azurerm_key_vault.key_vault.*.id)
+  scope                = join("", azurerm_key_vault.key_vault[*].id)
   role_definition_name = element(var.role_definition_name, count.index)
 }
 
+#tfsec:ignore:azure-keyvault-ensure-key-expiry
 resource "azurerm_key_vault_key" "example" {
   depends_on   = [azurerm_key_vault.key_vault, ]
-  count        = var.enabled ? 1 : 0
+  count        = var.enabled && var.key_enabled ? 1 : 0
   name         = format("mid-keyvault-%s", module.labels.id)
-  key_vault_id = join("", azurerm_key_vault.key_vault.*.id)
+  key_vault_id = join("", azurerm_key_vault.key_vault[*].id)
   key_type     = "RSA"
   key_size     = 2048
 
