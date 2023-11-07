@@ -19,10 +19,9 @@ for creating AZURE resources, and you can customize the inputs as needed. Below 
 
 # Examples
 
-# Example:key-vault-with-RBAC
+# Example: key-vault-with-RBAC
 
 ```hcl
-#Key Vault
 module "vault" {
   source                      = "git::https://github.com/opz0/terraform-azure-key-vault.git?ref=v1.0.0"
   name                        = "app"
@@ -42,11 +41,10 @@ module "vault" {
 }
 ```
 
-# Example:key-vault-with-access-policy
+# Example: key-vault-with-access-policy
 
 
 ```hcl
-# Key Vault
 module "vault" {
   source                      = "git::https://github.com/opz0/terraform-azure-key-vault.git?ref=v1.0.0"
   name                        = "app"
