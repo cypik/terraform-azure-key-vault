@@ -3,14 +3,14 @@ provider "azurerm" {
 }
 
 module "resource_group" {
-  source      = "git::https://github.com/opz0/terraform-azure-resource-group.git?ref=v1.0.0"
+  source      = "git::https://github.com/cypik/terraform-azure-resource-group.git?ref=v1.0.0"
   name        = "app51"
   environment = "test"
   location    = "North Europe"
 }
 
 module "vnet" {
-  source              = "git::https://github.com/opz0/terraform-azure-vnet.git?ref=v1.0.0"
+  source              = "git::https://github.com/cypik/terraform-azure-vnet.git?ref=v1.0.0"
   name                = "app"
   environment         = "test"
   resource_group_name = module.resource_group.resource_group_name
@@ -18,7 +18,7 @@ module "vnet" {
   address_space       = "10.0.0.0/16"
 }
 module "subnet" {
-  source = "git::https://github.com/opz0/terraform-azure-subnet.git?ref=v1.0.0"
+  source = "git::https://github.com/cypik/terraform-azure-subnet.git?ref=v1.0.0"
 
 
   name                 = "app"

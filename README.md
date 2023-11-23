@@ -23,7 +23,7 @@ for creating AZURE resources, and you can customize the inputs as needed. Below 
 
 ```hcl
 module "vault" {
-  source                      = "git::https://github.com/opz0/terraform-azure-key-vault.git?ref=v1.0.0"
+  source                      = "git::https://github.com/cypik/terraform-azure-key-vault.git?ref=v1.0.0"
   name                        = "app"
   environment                 = "test"
   sku_name                    = "standard"
@@ -46,7 +46,7 @@ module "vault" {
 
 ```hcl
 module "vault" {
-  source                      = "git::https://github.com/opz0/terraform-azure-key-vault.git?ref=v1.0.0"
+  source                      = "git::https://github.com/cypik/terraform-azure-key-vault.git?ref=v1.0.0"
   name                        = "app"
   environment                 = "test"
   resource_group_name         = module.resource_group.resource_group_name
@@ -138,10 +138,10 @@ This example demonstrates how to create various AZURE resources using the provid
 The module provides output variables that you can use in your Terraform configurations. You can access them using `module.<module_name>.<output_variable_name>`.
 
 ## Examples
-For detailed examples on how to use this module, please refer to the 'examples' directory within this repository.
+For detailed examples on how to use this module, please refer to the '[examples](https://github.com/cypik/terraform-azure-key-vault/blob/master/_example)' directory within this repository.
 
 ## License
-This Terraform module is provided under the '[License Name]' License. Please see the [LICENSE](https://github.com/opz0/terraform-azure-key-vault/blob/readme/LICENSE) file for more details.
+This Terraform module is provided under the '[License Name]' License. Please see the [LICENSE](https://github.com/cypik/terraform-azure-key-vault/blob/master/LICENSE) file for more details.
 
 ## Author
 Your Name
