@@ -3,24 +3,27 @@ provider "azurerm" {
 }
 
 module "resource_group" {
-  source      = "git::https://github.com/cypik/terraform-azure-resource-group.git?ref=v1.0.0"
+  source      = "cypik/resource-group/azure"
+  version     = "1.0.1"
   name        = "app51"
   environment = "test"
   location    = "North Europe"
 }
 
 module "vnet" {
-  source              = "git::https://github.com/cypik/terraform-azure-vnet.git?ref=v1.0.0"
+  source              = "cypik/vnet/azure"
+  version             = "1.0.1"
   name                = "app"
   environment         = "test"
   resource_group_name = module.resource_group.resource_group_name
   location            = module.resource_group.resource_group_location
   address_space       = "10.0.0.0/16"
 }
+
+
 module "subnet" {
-  source = "git::https://github.com/cypik/terraform-azure-subnet.git?ref=v1.0.0"
-
-
+  source               = "cypik/subnet/azure"
+  version              = "1.0.1"
   name                 = "app"
   environment          = "test"
   resource_group_name  = module.resource_group.resource_group_name
@@ -59,7 +62,7 @@ module "vault" {
   depends_on = [module.resource_group, module.vnet]
   access_policy = [
     {
-      object_id = "7712xxxxxxxxxxxxxxxxxxxxxxxxxx94193"
+      object_id = "xxxxxxxxxxxxxxxxxxxxxxxxxx"
       key_permissions = [
         "Get",
         "List",
