@@ -134,7 +134,7 @@ Replace **MIT** and **Cypik** with the appropriate license and your information.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) |>= 4.3.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.3.0 |
 
 ## Modules
 
