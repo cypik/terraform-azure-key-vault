@@ -51,7 +51,7 @@ module "subnet" {
 #Key Vault
 module "vault" {
   source                      = "./../.."
-  name                        = "ann149867hdc"
+  name                        = "app"
   environment                 = "test"
   resource_group_name         = module.resource_group.resource_group_name
   purge_protection_enabled    = false
@@ -64,7 +64,7 @@ module "vault" {
   depends_on = [module.resource_group, module.vnet]
   access_policy = [
     {
-      object_id = "d5ae204c-2aa4-41a4-8fbe-240bcc0c1710"
+      object_id = "xxxxxxxxxxxxxxxxxxxxxxxxxxx"
       key_permissions = [
         "Get",
         "List",

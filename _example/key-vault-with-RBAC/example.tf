@@ -51,10 +51,10 @@ module "subnet" {
 #Key Vault
 module "vault" {
   source                      = "./../.."
-  name                        = "anno98766h64dhyr"
+  name                        = "app"
   environment                 = "test"
   sku_name                    = "standard"
-  principal_id                = ["d5ae204c-2aa4-41a4-8fbe-240bcc0c1710"]
+  principal_id                = ["xxxxxxxxxxxxxxxxxxxxxxxxx"]
   role_definition_name        = ["Key Vault Administrator"]
   resource_group_name         = module.resource_group.resource_group_name
   subnet_id                   = module.subnet.default_subnet_id
