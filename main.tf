@@ -2,30 +2,32 @@ data "azurerm_client_config" "current_client_config" {}
 
 
 module "labels" {
-
   source      = "cypik/labels/azure"
-  version     = "1.0.1"
+  version     = "1.0.2"
   name        = var.name
   environment = var.environment
   managedby   = var.managedby
   label_order = var.label_order
   repository  = var.repository
+  extra_tags  = var.extra_tags
 }
 
 #tfsec:ignore:azure-keyvault-specify-network-acl
 #tfsec:ignore:azure-keyvault-no-purge
 resource "azurerm_key_vault" "key_vault" {
-  name                          = format("%s-kv", module.labels.id)
-  location                      = var.location
-  resource_group_name           = var.resource_group_name
-  enabled_for_disk_encryption   = var.enabled_for_disk_encryption
-  tenant_id                     = data.azurerm_client_config.current_client_config.tenant_id
-  purge_protection_enabled      = var.purge_protection_enabled
-  soft_delete_retention_days    = var.soft_delete_retention_days
-  enable_rbac_authorization     = var.enable_rbac_authorization
-  public_network_access_enabled = var.public_network_access_enabled
-  sku_name                      = var.sku_name
-  tags                          = module.labels.tags
+  name                            = format("%s-kv", module.labels.id)
+  location                        = var.location
+  resource_group_name             = var.resource_group_name
+  enabled_for_disk_encryption     = var.enabled_for_disk_encryption
+  tenant_id                       = data.azurerm_client_config.current_client_config.tenant_id
+  purge_protection_enabled        = var.purge_protection_enabled
+  soft_delete_retention_days      = var.soft_delete_retention_days
+  enable_rbac_authorization       = var.enable_rbac_authorization
+  enabled_for_deployment          = var.enabled_for_deployment
+  enabled_for_template_deployment = var.enabled_for_template_deployment
+  public_network_access_enabled   = var.public_network_access_enabled
+  sku_name                        = var.sku_name
+  tags                            = module.labels.tags
 
   dynamic "network_acls" {
     for_each = var.network_acls_bypass == null ? [] : ["acls"]
@@ -37,6 +39,17 @@ resource "azurerm_key_vault" "key_vault" {
       virtual_network_subnet_ids = var.network_acls_subnet_ids
     }
   }
+
+  dynamic "contact" {
+    for_each = var.contact != null ? [var.contact] : []
+
+    content {
+      email = contact.value.email
+      name  = contact.value.name
+      phone = contact.value.phone
+    }
+  }
+
   dynamic "access_policy" {
     for_each = var.access_policy
     content {

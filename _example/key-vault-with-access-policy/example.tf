@@ -4,34 +4,36 @@ provider "azurerm" {
 
 module "resource_group" {
   source      = "cypik/resource-group/azure"
-  version     = "1.0.1"
-  name        = "app51"
+  version     = "1.0.2"
+  name        = "app"
   environment = "test"
   location    = "North Europe"
 }
 
 module "vnet" {
-  source              = "cypik/vnet/azure"
-  version             = "1.0.1"
-  name                = "app"
-  environment         = "test"
-  resource_group_name = module.resource_group.resource_group_name
-  location            = module.resource_group.resource_group_location
-  address_space       = "10.0.0.0/16"
+  source                 = "cypik/vnet/azure"
+  version                = "1.0.2"
+  name                   = "app"
+  environment            = "test"
+  resource_group_name    = module.resource_group.resource_group_name
+  location               = module.resource_group.resource_group_location
+  address_space          = "10.0.0.0/16"
+  enable_ddos_pp         = false
+  enable_network_watcher = false
 }
 
 
 module "subnet" {
   source               = "cypik/subnet/azure"
-  version              = "1.0.1"
+  version              = "1.0.2"
   name                 = "app"
   environment          = "test"
   resource_group_name  = module.resource_group.resource_group_name
   location             = module.resource_group.resource_group_location
-  virtual_network_name = module.vnet.name
+  virtual_network_name = join("", module.vnet[*].name)
 
   #subnet
-  subnet_names    = ["subnet1new"]
+  subnet_names    = ["subnet1"]
   subnet_prefixes = ["10.0.1.0/24"]
 
   # route_table
@@ -49,7 +51,7 @@ module "subnet" {
 #Key Vault
 module "vault" {
   source                      = "./../.."
-  name                        = "ann14hdc"
+  name                        = "ann149867hdc"
   environment                 = "test"
   resource_group_name         = module.resource_group.resource_group_name
   purge_protection_enabled    = false
@@ -62,7 +64,7 @@ module "vault" {
   depends_on = [module.resource_group, module.vnet]
   access_policy = [
     {
-      object_id = "xxxxxxxxxxxxxxxxxxxxxxxxxx"
+      object_id = "d5ae204c-2aa4-41a4-8fbe-240bcc0c1710"
       key_permissions = [
         "Get",
         "List",
@@ -106,4 +108,5 @@ module "vault" {
       storage_permissions = []
     },
   ]
+
 }

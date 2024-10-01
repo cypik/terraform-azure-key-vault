@@ -1,5 +1,3 @@
-#Module      : LABEL
-#Description : Terraform label module variables.
 variable "name" {
   type        = string
   default     = ""
@@ -26,21 +24,26 @@ variable "label_order" {
 
 variable "managedby" {
   type        = string
-  default     = "Cypik"
-  description = "ManagedBy, eg 'cypik'."
+  default     = "info@cypik.com"
+  description = "ManagedBy, eg 'info@cypik.com'"
+}
+
+variable "extra_tags" {
+  type        = map(string)
+  default     = {}
+  description = "Additional tags (e.g. map(`BusinessUnit`,`XYZ`)."
 }
 
 variable "enabled" {
   type        = bool
-  description = "Set to false to prevent the module from creating any resources."
   default     = true
+  description = "Set to false to prevent the module from creating any resources."
 }
 
 variable "resource_group_name" {
   type        = string
   default     = ""
   description = "A container that holds related resources for an Azure solution"
-
 }
 
 variable "sku_name" {
@@ -85,6 +88,17 @@ variable "network_acls_subnet_ids" {
   description = "(Optional) One or more Subnet ID's which should be able to access this Key Vault."
 }
 
+variable "contact" {
+  description = "Contact information (Optional)"
+  type = object({
+    email = string
+    name  = optional(string)
+    phone = optional(string)
+  })
+  default = null
+}
+
+
 variable "secrets" {
   type        = any
   default     = {}
@@ -109,8 +123,6 @@ variable "access_policy" {
   description = "Map of access policies for an object_id (user, service principal, security group) to backend."
 }
 
-
-
 variable "enable_private_endpoint" {
   type        = bool
   default     = true
@@ -134,16 +146,19 @@ variable "existing_private_dns_zone" {
   default     = null
   description = "Name of the existing private DNS zone"
 }
+
 variable "enable_rbac_authorization" {
   type        = bool
   default     = false
   description = "(Optional) Boolean flag to specify whether Azure Key Vault uses Role Based Access Control (RBAC) for authorization of data actions."
 }
+
 variable "principal_id" {
   type        = list(string)
   default     = []
   description = " The ID of the Principal (User, Group or Service Principal) to assign the Role Definition to. Changing this forces a new resource to be created."
 }
+
 variable "role_definition_name" {
   type        = list(string)
   default     = []
@@ -184,6 +199,18 @@ variable "addon_virtual_network_id" {
 variable "location" {
   type    = string
   default = "North Europe"
+}
+
+variable "enabled_for_deployment" {
+  type        = bool
+  default     = false # Set a default value if needed
+  description = "Flag to enable or disable deployment"
+}
+
+variable "enabled_for_template_deployment" {
+  type        = bool
+  default     = false # Set a default value if needed
+  description = "Flag to enable or disable template deployment"
 }
 
 variable "key_enabled" {
