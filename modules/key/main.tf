@@ -1,6 +1,7 @@
 locals {
   role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
 }
+
 resource "azurerm_key_vault_key" "this" {
   key_opts        = var.opts
   key_type        = var.type

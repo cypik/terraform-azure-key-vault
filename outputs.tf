@@ -45,5 +45,4 @@ output "uri" {
 output "secrets" {
   description = "A map of secret names with full secret details."
   value       = module.secrets
-
 }

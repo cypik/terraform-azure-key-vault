@@ -85,21 +85,8 @@ variable "diagnostic_settings" {
     marketplace_partner_resource_id          = optional(string, null)
   }))
   default     = {}
-  description = <<DESCRIPTION
-A map of diagnostic settings to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-
-- `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
-- `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
-- `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `["allLogs"]`.
-- `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `["AllMetrics"]`.
-- `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
-- `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to.
-- `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to.
-- `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to.
-- `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected.
-- `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
-DESCRIPTION
   nullable    = false
+  description = "Diagnostic settings map for Key Vault, defining logs, metrics, and their destinations (Log Analytics, Event Hub, Storage, Marketplace)."
 
   validation {
     condition     = alltrue([for _, v in var.diagnostic_settings : contains(["Dedicated", "AzureDiagnostics"], v.log_analytics_destination_type)])
@@ -119,11 +106,7 @@ DESCRIPTION
 variable "enable_telemetry" {
   type        = bool
   default     = true
-  description = <<DESCRIPTION
-This variable controls whether or not telemetry is enabled for the module.
-For more information see https://aka.ms/avm/telemetryinfo.
-If it is set to false, then no telemetry will be collected.
-DESCRIPTION
+  description = "Controls whether telemetry is enabled for the module; see https://aka.ms/avm/telemetryinfo for details."
 }
 
 variable "enabled_for_deployment" {
@@ -177,27 +160,9 @@ variable "keys" {
     }), null)
   }))
   default     = {}
-  description = <<DESCRIPTION
-A map of keys to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-
-- `name` - The name of the key.
-- `key_type` - The type of the key. Possible values are `EC` and `RSA`.
-- `key_opts` - A list of key options. Possible values are `decrypt`, `encrypt`, `sign`, `unwrapKey`, `verify`, and `wrapKey`.
-- `key_size` - The size of the key. Required for `RSA` keys.
-- `curve` - The curve of the key. Required for `EC` keys.  Possible values are `P-256`, `P-256K`, `P-384`, and `P-521`. The API will default to `P-256` if nothing is specified.
-- `not_before_date` - The not before date of the key.
-- `expiration_date` - The expiration date of the key.
-- `tags` - A mapping of tags to assign to the key.
-- `rotation_policy` - The rotation policy of the key.
-  - `automatic` - The automatic rotation policy of the key.
-    - `time_after_creation` - The time after creation of the key before it is automatically rotated.
-    - `time_before_expiry` - The time before expiry of the key before it is automatically rotated.
-  - `expire_after` - The time after which the key expires.
-  - `notify_before_expiry` - The time before expiry of the key when notification emails will be sent.
-
-Supply role assignments in the same way as for `var.role_assignments`.
-DESCRIPTION
   nullable    = false
+  description = "Map of Key Vault keys to create, with rotation policies and optional role assignments; keyed arbitrarily to avoid unknown-plan-time issues."
+
 }
 
 variable "legacy_access_policies" {
@@ -210,19 +175,8 @@ variable "legacy_access_policies" {
     storage_permissions     = optional(set(string), [])
   }))
   default     = {}
-  description = <<DESCRIPTION
-A map of legacy access policies to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-
-Requires `var.legacy_access_policies_enabled` to be `true`.
-
-- `object_id` - (Required) The object ID of the principal to assign the access policy to.
-- `application_id` - (Optional) The object ID of an Application in Azure Active Directory. Changing this forces a new resource to be created.
-- `certifiate_permissions` - (Optional) A list of certificate permissions. Possible values are: `Backup`, `Create`, `Delete`, `DeleteIssuers`, `Get`, `GetIssuers`, `Import`, `List`, `ListIssuers`, `ManageContacts`, `ManageIssuers`, `Purge`, `Recover`, `Restore`, `SetIssuers`, and `Update`.
-- `key_permissions` - (Optional) A list of key permissions. Possible value are: `Backup`, `Create`, `Decrypt`, `Delete`, `Encrypt`, `Get`, `Import`, `List`, `Purge`, `Recover`, `Restore`, `Sign`, `UnwrapKey`, `Update`, `Verify`, `WrapKey`, `Release`, `Rotate`, `GetRotationPolicy`, and `SetRotationPolicy`.
-- `secret_permissions` - (Optional) A list of secret permissions. Possible values are: `Backup`, `Delete`, `Get`, `List`, `Purge`, `Recover`, `Restore`, and `Set`.
-- `storage_permissions` - (Optional) A list of storage permissions. Possible values are: `Backup`, `Delete`, `DeleteSAS`, `Get`, `GetSAS`, `List`, `ListSAS`, `Purge`, `Recover`, `RegenerateKey`, `Restore`, `Set`, `SetSAS`, and `Update`.
-DESCRIPTION
   nullable    = false
+  description = "Map of legacy access policies for Key Vault, keyed arbitrarily; requires `legacy_access_policies_enabled = true` and at least one permission set per entry."
 
   validation {
     error_message = "Object ID must be a valid GUID."
@@ -283,16 +237,7 @@ variable "network_acls" {
     virtual_network_subnet_ids = optional(list(string), [])
   })
   default     = {}
-  description = <<DESCRIPTION
-The network ACL configuration for the Key Vault.
-If not specified then the Key Vault will be created with a firewall that blocks access.
-Specify `null` to create the Key Vault with no firewall.
-
-- `bypass` - (Optional) Should Azure Services bypass the ACL. Possible values are `AzureServices` and `None`. Defaults to `None`.
-- `default_action` - (Optional) The default action when no rule matches. Possible values are `Allow` and `Deny`. Defaults to `Deny`.
-- `ip_rules` - (Optional) A list of IP rules in CIDR format. Defaults to `[]`.
-- `virtual_network_subnet_ids` - (Optional) When using with Service Endpoints, a list of subnet IDs to associate with the Key Vault. Defaults to `[]`.
-DESCRIPTION
+  description = "Configures Key Vault network ACLs with bypass, default action, IP rules, and subnet restrictions; set null to disable firewall."
 
   validation {
     condition     = var.network_acls == null ? true : contains(["AzureServices", "None"], var.network_acls.bypass)
@@ -336,26 +281,8 @@ variable "private_endpoints" {
     })), {})
   }))
   default     = {}
-  description = <<DESCRIPTION
-A map of private endpoints to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-
-- `name` - (Optional) The name of the private endpoint. One will be generated if not set.
-- `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. See `var.role_assignments` for more information.
-- `lock` - (Optional) The lock level to apply to the private endpoint. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
-- `tags` - (Optional) A mapping of tags to assign to the private endpoint.
-- `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
-- `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. One will be generated if not set.
-- `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module.
-- `application_security_group_resource_ids` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-- `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set.
-- `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
-- `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group.
-- `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of the Key Vault.
-- `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-  - `name` - The name of the IP configuration.
-  - `private_ip_address` - The private IP address of the IP configuration.
-DESCRIPTION
   nullable    = false
+  description = "Map of Key Vault private endpoints with subnet, DNS, role assignments, ASGs, locks, IP configs, and optional names/tags."
 }
 
 variable "private_endpoints_manage_dns_zone_group" {
@@ -383,19 +310,8 @@ variable "role_assignments" {
     principal_type                         = optional(string, null)
   }))
   default     = {}
-  description = <<DESCRIPTION
-A map of role assignments to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-
-- `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
-- `principal_id` - The ID of the principal to assign the role to.
-- `description` - The description of the role assignment.
-- `skip_service_principal_aad_check` - If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
-- `condition` - The condition which will be used to scope the role assignment.
-- `condition_version` - The version of the condition syntax. If you are using a condition, valid values are '2.0'.
-
-> Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
-DESCRIPTION
   nullable    = false
+  description = "Map of role assignments for Key Vault with fields like role_definition_id_or_name, principal_id, condition, and AAD check options (e.g., skip_service_principal_aad_check)."
 }
 
 variable "secrets" {
@@ -452,12 +368,7 @@ variable "wait_for_rbac_before_contact_operations" {
     destroy = optional(string, "0s")
   })
   default     = {}
-  description = <<DESCRIPTION
-This variable controls the amount of time to wait before performing contact operations.
-It only applies when `var.role_assignments` and `var.contacts` are both set.
-This is useful when you are creating role assignments on the key vault and immediately creating keys in it.
-The default is 30 seconds for create and 0 seconds for destroy.
-DESCRIPTION
+  description = "Time to wait (default: create=30s, destroy=0s) before contact operations when both role_assignments and contacts are set."
 }
 
 variable "wait_for_rbac_before_key_operations" {
@@ -466,12 +377,7 @@ variable "wait_for_rbac_before_key_operations" {
     destroy = optional(string, "0s")
   })
   default     = {}
-  description = <<DESCRIPTION
-This variable controls the amount of time to wait before performing key operations.
-It only applies when `var.role_assignments` and `var.keys` are both set.
-This is useful when you are creating role assignments on the key vault and immediately creating keys in it.
-The default is 30 seconds for create and 0 seconds for destroy.
-DESCRIPTION
+  description = "Time to wait (default: create=30s, destroy=0s) before key operations when both role_assignments and keys are set."
 }
 
 variable "wait_for_rbac_before_secret_operations" {
@@ -480,17 +386,22 @@ variable "wait_for_rbac_before_secret_operations" {
     destroy = optional(string, "0s")
   })
   default     = {}
-  description = <<DESCRIPTION
-This variable controls the amount of time to wait before performing secret operations.
-It only applies when `var.role_assignments` and `var.secrets` are both set.
-This is useful when you are creating role assignments on the key vault and immediately creating secrets in it.
-The default is 30 seconds for create and 0 seconds for destroy.
-DESCRIPTION
   nullable    = false
+  description = "Time to wait (default: create=30s, destroy=0s) before secret operations when both role_assignments and secrets are set."
 }
 
 variable "public_network_access_enabled" {
   type        = bool
   default     = true
   description = "(Optional) Whether public network access is allowed for this Key Vault. Defaults to true"
+}
+
+variable "contacts" {
+  type = map(object({
+    email = string
+    name  = optional(string, null)
+    phone = optional(string, null)
+  }))
+  default     = {}
+  description = "A map of contacts for the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time."
 }

@@ -67,19 +67,8 @@ variable "role_assignments" {
     principal_type                         = optional(string, null)
   }))
   default     = {}
-  description = <<DESCRIPTION
-A map of role assignments to create on the key. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-
-- `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
-- `principal_id` - The ID of the principal to assign the role to.
-- `description` - The description of the role assignment.
-- `skip_service_principal_aad_check` - If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
-- `condition` - The condition which will be used to scope the role assignment.
-- `condition_version` - The version of the condition syntax. If you are using a condition, valid values are '2.0'.
-
-> Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
-DESCRIPTION
   nullable    = false
+  description = "Map of Key Vault keys to create, with rotation policies and optional role assignments; keyed arbitrarily to avoid unknown-plan-time issues."
 }
 
 variable "rotation_policy" {
@@ -92,15 +81,7 @@ variable "rotation_policy" {
     notify_before_expiry = optional(string, null)
   })
   default     = null
-  description = <<DESCRIPTION
-The rotation policy of the key:
-
-- `automatic` - The automatic rotation policy of the key.
-  - `time_after_creation` - The time after creation of the key before it is automatically rotated as an ISO 8601 duration.
-  - `time_before_expiry` - The time before expiry of the key before it is automatically rotated as an ISO 8601 duration.
-- `expire_after` - The time after which the key expires.
-- `notify_before_expiry` - The time before expiry of the key when notification emails will be sent as an ISO 8601 duration.
-DESCRIPTION
+  description = "Map of Key Vault keys to create, with rotation policies and optional role assignments; keyed arbitrarily to avoid unknown-plan-time issues."
 }
 
 variable "size" {
