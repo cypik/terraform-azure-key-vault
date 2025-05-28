@@ -138,12 +138,12 @@ module "keyvault" {
   resource_group_name = module.resource_group.resource_group_name
   location            = module.resource_group.resource_group_location
   tenant_id           = data.azurerm_client_config.this.tenant_id
-  diagnostic_settings = {
-    to_la = {
-      name                  = "to-la"
-      workspace_resource_id = azurerm_log_analytics_workspace.this.id
+  diagnostic_settings = [
+    {
+      name                  = "test"
+      workspace_resource_id = module.log-analytics.workspace_id
     }
-  }
+  ]
 }
 ```
 
@@ -160,11 +160,9 @@ module "keyvault" {
   tenant_id           = data.azurerm_client_config.this.tenant_id
   private_endpoints = {
     primary = {
-      private_dns_zone_resource_ids = [azurerm_private_dns_zone.this.id]
       subnet_resource_id            = module.subnet.default_subnet_id
     }
   }
-  public_network_access_enabled = false
 }
 ```
 
@@ -186,7 +184,7 @@ Replace **MIT** and **Cypik** with the appropriate license and your information.
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.11.4 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >=4.28.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 4.30.0 |
 | <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) | ~> 0.3.5 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.7 |
 | <a name="requirement_time"></a> [time](#requirement\_time) | ~> 0.13.1 |
@@ -195,7 +193,7 @@ Replace **MIT** and **Cypik** with the appropriate license and your information.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >=4.28.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.30.0 |
 | <a name="provider_modtm"></a> [modtm](#provider\_modtm) | ~> 0.3.5 |
 | <a name="provider_random"></a> [random](#provider\_random) | ~> 3.7 |
 | <a name="provider_time"></a> [time](#provider\_time) | ~> 0.13.1 |
@@ -217,6 +215,7 @@ Replace **MIT** and **Cypik** with the appropriate license and your information.
 | [azurerm_key_vault_certificate_contacts.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_certificate_contacts) | resource |
 | [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) | resource |
 | [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
+| [azurerm_private_dns_zone.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone) | resource |
 | [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) | resource |
 | [azurerm_private_endpoint.this_unmanaged_dns_zone_groups](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) | resource |
 | [azurerm_private_endpoint_application_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association) | resource |
@@ -234,7 +233,7 @@ Replace **MIT** and **Cypik** with the appropriate license and your information.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_contacts"></a> [contacts](#input\_contacts) | A map of contacts for the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. | <pre>map(object({<br>    email = string<br>    name  = optional(string, null)<br>    phone = optional(string, null)<br>  }))</pre> | `{}` | no |
-| <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings) | Diagnostic settings map for Key Vault, defining logs, metrics, and their destinations (Log Analytics, Event Hub, Storage, Marketplace). | <pre>map(object({<br>    name                                     = optional(string, null)<br>    log_categories                           = optional(set(string), [])<br>    log_groups                               = optional(set(string), ["allLogs"])<br>    metric_categories                        = optional(set(string), ["AllMetrics"])<br>    log_analytics_destination_type           = optional(string, "Dedicated")<br>    workspace_resource_id                    = optional(string, null)<br>    storage_account_resource_id              = optional(string, null)<br>    event_hub_authorization_rule_resource_id = optional(string, null)<br>    event_hub_name                           = optional(string, null)<br>    marketplace_partner_resource_id          = optional(string, null)<br>  }))</pre> | `{}` | no |
+| <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings) | List of diagnostic settings for Key Vault | <pre>list(object({<br>    name                                     = optional(string, null)<br>    log_categories                           = optional(set(string), [])<br>    log_groups                               = optional(set(string), ["allLogs"])<br>    metric_categories                        = optional(set(string), ["AllMetrics"])<br>    log_analytics_destination_type           = optional(string, "Dedicated")<br>    workspace_resource_id                    = optional(string, null)<br>    storage_account_resource_id              = optional(string, null)<br>    event_hub_authorization_rule_resource_id = optional(string, null)<br>    event_hub_name                           = optional(string, null)<br>    marketplace_partner_resource_id          = optional(string, null)<br>  }))</pre> | `[]` | no |
 | <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry) | Controls whether telemetry is enabled for the module; see https://aka.ms/avm/telemetryinfo for details. | `bool` | `true` | no |
 | <a name="input_enabled_for_deployment"></a> [enabled\_for\_deployment](#input\_enabled\_for\_deployment) | Specifies whether Azure Virtual Machines are permitted to retrieve certificates stored as secrets from the vault. | `bool` | `false` | no |
 | <a name="input_enabled_for_disk_encryption"></a> [enabled\_for\_disk\_encryption](#input\_enabled\_for\_disk\_encryption) | Specifies whether Azure Disk Encryption is permitted to retrieve secrets from the vault and unwrap keys. | `bool` | `false` | no |
@@ -250,9 +249,9 @@ Replace **MIT** and **Cypik** with the appropriate license and your information.
 | <a name="input_managedby"></a> [managedby](#input\_managedby) | ManagedBy, eg 'info@cypik.com' | `string` | `"info@cypik.com"` | no |
 | <a name="input_name"></a> [name](#input\_name) | The name of the Key Vault. | `string` | n/a | yes |
 | <a name="input_network_acls"></a> [network\_acls](#input\_network\_acls) | Configures Key Vault network ACLs with bypass, default action, IP rules, and subnet restrictions; set null to disable firewall. | <pre>object({<br>    bypass                     = optional(string, "None")<br>    default_action             = optional(string, "Deny")<br>    ip_rules                   = optional(list(string), [])<br>    virtual_network_subnet_ids = optional(list(string), [])<br>  })</pre> | `{}` | no |
-| <a name="input_private_endpoints"></a> [private\_endpoints](#input\_private\_endpoints) | Map of Key Vault private endpoints with subnet, DNS, role assignments, ASGs, locks, IP configs, and optional names/tags. | <pre>map(object({<br>    name = optional(string, null)<br>    role_assignments = optional(map(object({<br>      role_definition_id_or_name             = string<br>      principal_id                           = string<br>      description                            = optional(string, null)<br>      skip_service_principal_aad_check       = optional(bool, false)<br>      condition                              = optional(string, null)<br>      condition_version                      = optional(string, null)<br>      delegated_managed_identity_resource_id = optional(string, null)<br>      principal_type                         = optional(string, null)<br>    })), {})<br>    lock = optional(object({<br>      kind = string<br>      name = optional(string, null)<br>    }), null)<br>    tags                                    = optional(map(string), null)<br>    subnet_resource_id                      = string<br>    private_dns_zone_group_name             = optional(string, "default")<br>    private_dns_zone_resource_ids           = optional(set(string), [])<br>    application_security_group_associations = optional(map(string), {})<br>    private_service_connection_name         = optional(string, null)<br>    network_interface_name                  = optional(string, null)<br>    location                                = optional(string, null)<br>    resource_group_name                     = optional(string, null)<br>    ip_configurations = optional(map(object({<br>      name               = string<br>      private_ip_address = string<br>    })), {})<br>  }))</pre> | `{}` | no |
+| <a name="input_private_endpoints"></a> [private\_endpoints](#input\_private\_endpoints) | Map of Key Vault private endpoints with subnet, DNS, role assignments, ASGs, locks, IP configs, and optional names/tags. | <pre>map(object({<br>    subnet_resource_id              = string<br>    location                        = optional(string)<br>    name                            = optional(string)<br>    resource_group_name             = optional(string)<br>    network_interface_name          = optional(string)<br>    private_service_connection_name = optional(string)<br>    private_dns_zone_group_name     = optional(string)<br>    private_dns_zone_resource_ids   = optional(list(string), [])<br>    ip_configurations = optional(list(object({<br>      name               = string<br>      private_ip_address = string<br>    })), [])<br>    application_security_group_associations = optional(map(string), {})<br>    tags                                    = optional(map(string), {})<br>  }))</pre> | `{}` | no |
 | <a name="input_private_endpoints_manage_dns_zone_group"></a> [private\_endpoints\_manage\_dns\_zone\_group](#input\_private\_endpoints\_manage\_dns\_zone\_group) | Whether to manage private DNS zone groups with this module. If set to false, you must manage private DNS zone groups externally, e.g. using Azure Policy. | `bool` | `true` | no |
-| <a name="input_public_network_access_enabled"></a> [public\_network\_access\_enabled](#input\_public\_network\_access\_enabled) | (Optional) Whether public network access is allowed for this Key Vault. Defaults to true | `bool` | `true` | no |
+| <a name="input_public_network_access_enabled"></a> [public\_network\_access\_enabled](#input\_public\_network\_access\_enabled) | (Optional) Whether public network access is allowed for this Key Vault. Defaults to true | `bool` | `false` | no |
 | <a name="input_purge_protection_enabled"></a> [purge\_protection\_enabled](#input\_purge\_protection\_enabled) | Specifies whether protection against purge is enabled for this Key Vault. Note once enabled this cannot be disabled. | `bool` | `true` | no |
 | <a name="input_repository"></a> [repository](#input\_repository) | Terraform current module repo | `string` | `"https://github.com/cypik/terraform-azure-key-vault"` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | The resource group where the resources will be deployed. | `string` | n/a | yes |

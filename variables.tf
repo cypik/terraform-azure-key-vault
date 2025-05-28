@@ -72,7 +72,7 @@ variable "tenant_id" {
 }
 
 variable "diagnostic_settings" {
-  type = map(object({
+  type = list(object({
     name                                     = optional(string, null)
     log_categories                           = optional(set(string), [])
     log_groups                               = optional(set(string), ["allLogs"])
@@ -84,24 +84,27 @@ variable "diagnostic_settings" {
     event_hub_name                           = optional(string, null)
     marketplace_partner_resource_id          = optional(string, null)
   }))
-  default     = {}
+  default     = []
   nullable    = false
-  description = "Diagnostic settings map for Key Vault, defining logs, metrics, and their destinations (Log Analytics, Event Hub, Storage, Marketplace)."
+  description = "List of diagnostic settings for Key Vault"
 
   validation {
-    condition     = alltrue([for _, v in var.diagnostic_settings : contains(["Dedicated", "AzureDiagnostics"], v.log_analytics_destination_type)])
+    condition = alltrue([
+      for v in var.diagnostic_settings :
+      contains(["Dedicated", "AzureDiagnostics"], v.log_analytics_destination_type)
+    ])
     error_message = "Log analytics destination type must be one of: 'Dedicated', 'AzureDiagnostics'."
   }
+
   validation {
-    condition = alltrue(
-      [
-        for _, v in var.diagnostic_settings :
-        v.workspace_resource_id != null || v.storage_account_resource_id != null || v.event_hub_authorization_rule_resource_id != null || v.marketplace_partner_resource_id != null
-      ]
-    )
-    error_message = "At least one of `workspace_resource_id`, `storage_account_resource_id`, `marketplace_partner_resource_id`, or `event_hub_authorization_rule_resource_id`, must be set."
+    condition = alltrue([
+      for v in var.diagnostic_settings :
+      v.workspace_resource_id != null || v.storage_account_resource_id != null || v.event_hub_authorization_rule_resource_id != null || v.marketplace_partner_resource_id != null
+    ])
+    error_message = "At least one of `workspace_resource_id`, `storage_account_resource_id`, `marketplace_partner_resource_id`, or `event_hub_authorization_rule_resource_id` must be set."
   }
 }
+
 
 variable "enable_telemetry" {
   type        = bool
@@ -251,34 +254,20 @@ variable "network_acls" {
 
 variable "private_endpoints" {
   type = map(object({
-    name = optional(string, null)
-    role_assignments = optional(map(object({
-      role_definition_id_or_name             = string
-      principal_id                           = string
-      description                            = optional(string, null)
-      skip_service_principal_aad_check       = optional(bool, false)
-      condition                              = optional(string, null)
-      condition_version                      = optional(string, null)
-      delegated_managed_identity_resource_id = optional(string, null)
-      principal_type                         = optional(string, null)
-    })), {})
-    lock = optional(object({
-      kind = string
-      name = optional(string, null)
-    }), null)
-    tags                                    = optional(map(string), null)
-    subnet_resource_id                      = string
-    private_dns_zone_group_name             = optional(string, "default")
-    private_dns_zone_resource_ids           = optional(set(string), [])
-    application_security_group_associations = optional(map(string), {})
-    private_service_connection_name         = optional(string, null)
-    network_interface_name                  = optional(string, null)
-    location                                = optional(string, null)
-    resource_group_name                     = optional(string, null)
-    ip_configurations = optional(map(object({
+    subnet_resource_id              = string
+    location                        = optional(string)
+    name                            = optional(string)
+    resource_group_name             = optional(string)
+    network_interface_name          = optional(string)
+    private_service_connection_name = optional(string)
+    private_dns_zone_group_name     = optional(string)
+    private_dns_zone_resource_ids   = optional(list(string), [])
+    ip_configurations = optional(list(object({
       name               = string
       private_ip_address = string
-    })), {})
+    })), [])
+    application_security_group_associations = optional(map(string), {})
+    tags                                    = optional(map(string), {})
   }))
   default     = {}
   nullable    = false
@@ -392,7 +381,7 @@ variable "wait_for_rbac_before_secret_operations" {
 
 variable "public_network_access_enabled" {
   type        = bool
-  default     = true
+  default     = false
   description = "(Optional) Whether public network access is allowed for this Key Vault. Defaults to true"
 }
 

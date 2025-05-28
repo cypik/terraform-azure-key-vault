@@ -44,11 +44,6 @@ module "subnet" {
     }
   ]
 }
-resource "azurerm_private_dns_zone" "this" {
-  name                = "privatelink.vaultcore.azure.net"
-  resource_group_name = module.resource_group.resource_group_name
-}
-
 
 module "keyvault" {
   source              = "../../"
@@ -59,9 +54,7 @@ module "keyvault" {
   tenant_id           = data.azurerm_client_config.this.tenant_id
   private_endpoints = {
     primary = {
-      private_dns_zone_resource_ids = [azurerm_private_dns_zone.this.id]
-      subnet_resource_id            = module.subnet.default_subnet_id
+      subnet_resource_id = module.subnet.default_subnet_id
     }
   }
-  public_network_access_enabled = false
 }

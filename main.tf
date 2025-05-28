@@ -9,20 +9,27 @@ module "labels" {
   extra_tags  = var.extra_tags
 }
 
+resource "azurerm_private_dns_zone" "this" {
+  name                = "privatelink.vaultcore.azure.net"
+  resource_group_name = var.resource_group_name
+}
+
 locals {
   role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
 }
 
 locals {
-  private_endpoint_application_security_group_associations = { for assoc in flatten([
-    for pe_k, pe_v in var.private_endpoints : [
-      for asg_k, asg_v in pe_v.application_security_group_associations : {
-        asg_key         = asg_k
-        pe_key          = pe_k
-        asg_resource_id = asg_v
-      }
-    ]
-  ]) : "${assoc.pe_key}-${assoc.asg_key}" => assoc }
+  private_endpoint_application_security_group_associations = {
+    for assoc in flatten([
+      for pe_k, pe_v in var.private_endpoints : [
+        for asg_k, asg_v in pe_v.application_security_group_associations : {
+          asg_key         = asg_k
+          pe_key          = pe_k
+          asg_resource_id = asg_v
+        }
+      ]
+    ]) : "${assoc.pe_key}-${assoc.asg_key}" => assoc
+  }
 }
 
 resource "azurerm_key_vault_access_policy" "this" {
@@ -54,8 +61,9 @@ resource "azurerm_private_endpoint" "this" {
     private_connection_resource_id = azurerm_key_vault.this.id
     subresource_names              = ["vault"]
   }
+
   dynamic "ip_configuration" {
-    for_each = each.value.ip_configurations
+    for_each = try(each.value.ip_configurations, [])
 
     content {
       name               = ip_configuration.value.name
@@ -64,8 +72,9 @@ resource "azurerm_private_endpoint" "this" {
       subresource_name   = "vault"
     }
   }
+
   dynamic "private_dns_zone_group" {
-    for_each = length(each.value.private_dns_zone_resource_ids) > 0 ? ["this"] : []
+    for_each = try(length(each.value.private_dns_zone_resource_ids), 0) > 0 ? ["this"] : []
 
     content {
       name                 = each.value.private_dns_zone_group_name
@@ -90,8 +99,9 @@ resource "azurerm_private_endpoint" "this_unmanaged_dns_zone_groups" {
     private_connection_resource_id = azurerm_key_vault.this.id
     subresource_names              = ["vault"]
   }
+
   dynamic "ip_configuration" {
-    for_each = each.value.ip_configurations
+    for_each = try(each.value.ip_configurations, [])
 
     content {
       name               = ip_configuration.value.name
@@ -113,7 +123,6 @@ resource "azurerm_private_endpoint_application_security_group_association" "this
   private_endpoint_id           = azurerm_private_endpoint.this[each.value.pe_key].id
 }
 
-
 resource "azurerm_key_vault" "this" {
   location                        = var.location
   name                            = format("%s-kv", module.labels.id)
@@ -128,7 +137,6 @@ resource "azurerm_key_vault" "this" {
   purge_protection_enabled        = var.purge_protection_enabled
   soft_delete_retention_days      = var.soft_delete_retention_days
   tags                            = var.tags
-
 
   dynamic "network_acls" {
     for_each = var.network_acls != null ? { this = var.network_acls } : {}
@@ -165,7 +173,9 @@ resource "azurerm_role_assignment" "this" {
 }
 
 resource "azurerm_monitor_diagnostic_setting" "this" {
-  for_each = var.diagnostic_settings
+  for_each = {
+    for setting in var.diagnostic_settings : setting.name => setting
+  }
 
   name                           = each.value.name != null ? each.value.name : "diag-${var.name}-${module.labels.id}"
   target_resource_id             = azurerm_key_vault.this.id
@@ -178,21 +188,20 @@ resource "azurerm_monitor_diagnostic_setting" "this" {
 
   dynamic "enabled_log" {
     for_each = each.value.log_categories
-
     content {
       category = enabled_log.value
     }
   }
+
   dynamic "enabled_log" {
     for_each = each.value.log_groups
-
     content {
       category_group = enabled_log.value
     }
   }
+
   dynamic "metric" {
     for_each = each.value.metric_categories
-
     content {
       category = metric.value
     }
