@@ -26,7 +26,7 @@ for creating AZURE resources, and you can customize the inputs as needed. Below 
 ```hcl
 module "vault" {
   source                      = "cypik/key-vault/azure"
-  version                     = "1.0.2"
+  version                     = "1.0.3"
   name                        = "app"
   environment                 = "test"
   sku_name                    = "standard"
@@ -50,7 +50,7 @@ module "vault" {
 ```hcl
 module "vault" {
   source                      = "cypik/key-vault/azure"
-  version                     = "1.0.2"
+  version                     = "1.0.3"
   name                        = "app"
   environment                 = "test"
   resource_group_name         = module.resource_group.resource_group_name
@@ -127,26 +127,27 @@ Replace **MIT** and **Cypik** with the appropriate license and your information.
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.5 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 4.3.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.15.8 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 5.4.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.3.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 5.4.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_labels"></a> [labels](#module\_labels) | cypik/labels/azure | 1.0.2 |
+| <a name="module_labels"></a> [labels](#module\_labels) | cypik/labels/azure | 1.0.3 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
 | [azurerm_key_vault.key_vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault) | resource |
+| [azurerm_key_vault_certificate_contacts.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_certificate_contacts) | resource |
 | [azurerm_key_vault_key.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_key) | resource |
 | [azurerm_key_vault_secret.key_vault_secret](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
 | [azurerm_private_dns_a_record.arecord](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_a_record) | resource |
@@ -158,6 +159,7 @@ Replace **MIT** and **Cypik** with the appropriate license and your information.
 | [azurerm_role_assignment.rbac_user_assigned](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_user_assigned_identity.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 | [azurerm_client_config.current_client_config](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
+| [azurerm_private_dns_zone.existing](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/private_dns_zone) | data source |
 | [azurerm_private_endpoint_connection.private-ip](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/private_endpoint_connection) | data source |
 
 ## Inputs
